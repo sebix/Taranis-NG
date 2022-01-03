@@ -322,13 +322,9 @@ const keyboardMixin = targetId => ({
                             break;
 
                         case 'open_item_source':
-<<<<<<< HEAD
                             if (this.card.link_url) {
                                 window.open(this.card.link_url, undefined, "noreferrer");
                             }
-=======
-                            window.open(this.card.link_url, undefined, "noreferrer");
->>>>>>> 0bfa865 (gui shortcuts: fix opening link in all occasions)
                             break;
 
                         case 'open_search':
@@ -416,13 +412,9 @@ const keyboardMixin = targetId => ({
                             break;
 
                         case 'open_item_source':
-<<<<<<< HEAD
                             if (this.card.link_url) {
                                 window.open(this.card.link_url, undefined, "noreferrer");
                             }
-=======
-                            window.open(this.card.link_url, undefined, "noreferrer");
->>>>>>> 0bfa865 (gui shortcuts: fix opening link in all occasions)
                             break;
 
                         default:
