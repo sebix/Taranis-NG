@@ -201,6 +201,13 @@ const keyboardMixin = targetId => ({
                                     //this.keyRemaper();
                                     this.cardReindex();
                                 }, 150);
+                            } else {
+                                this.$root.$emit('notification',
+                                    {
+                                        type: 'error',
+                                        loc: 'assess.shortcuts.aggregate_no_group'
+                                    }
+                                );
                             }
                             break;
 
