@@ -28,7 +28,7 @@
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^16.0.0",
     "@ckeditor/ckeditor5-vue": "^1.0.3",
-    "@vue/cli": "^4.5.15",
+    "@vue/cli": "^4.5.17",
     "axios": "^0.24.0",
     "ckeditor": "^4.12.1",
     "ckeditor5-vuejs": "^1.0.18",
