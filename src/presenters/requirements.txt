@@ -9,7 +9,7 @@ MarkupSafe==1.1.0
 marshmallow==3.5.0
 marshmallow-enum==1.5.1
 pdfkit==0.6.1
-PyJWT==1.7.1
+PyJWT==2.4.0
 python-dotenv==0.10.5
 pytz==2019.3
 PyYAML==5.4
