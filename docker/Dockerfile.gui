@@ -11,7 +11,7 @@ COPY ./src/gui/package-lock.json .
 RUN npm run build
 
 # production stage
-FROM nginx:stable-alpine as production-stage
+FROM nginx:1.23.3-alpine as production-stage
 
 RUN rm /docker-entrypoint.d/30-tune-worker-processes.sh
 COPY ./src/gui/extras/30-envsubst-on-javascript.sh /docker-entrypoint.d/
