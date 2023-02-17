@@ -1,8 +1,8 @@
 import requests
 
 from .base_bot import BaseBot
-from schema import word_list
-from schema.parameter import Parameter, ParameterType
+from shared.schema import word_list
+from shared.schema.parameter import Parameter, ParameterType
 from remote.core_api import CoreApi
 
 
@@ -53,7 +53,7 @@ class WordlistUpdaterBot(BaseBot):
                 description = 'Stop word list category created by Updater Bot.'
                 entries = []
 
-                category = word_list.WordListCategory(name, description, entries)
+                category = word_list.WordListCategory(name, description, '', entries)
                 word_list_category_schema = word_list.WordListCategorySchema()
 
                 CoreApi.add_word_list_category(word_list_id, word_list_category_schema.dump(category))

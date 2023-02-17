@@ -1,15 +1,19 @@
 #! /usr/bin/env python
 
 from os import abort, getenv, read
+import random
 import socket
+import string
 import time
 import logging
 from flask import Flask
 from flask_script import Manager,Command
 from flask_script.commands import Option
+import traceback
 
 from managers import db_manager
 from model import *
+from model import apikey
 from remote.collectors_api import CollectorsApi
 
 app = Flask(__name__)
@@ -45,8 +49,6 @@ class AccountManagement(Command):
     )
 
     def run(self, opt_list, opt_create, opt_edit, opt_delete, opt_username, opt_name, opt_password, opt_roles):
-        from scripts import permissions
-        permissions.run(db_manager.db)
 
         if (opt_list):
             users = user.User.get_all()
@@ -82,9 +84,6 @@ class AccountManagement(Command):
 
                 roles.append(r)
 
-            # create user in the appropriate authenticator
-
-
         if (opt_edit):
             if (not opt_username):
                 app.logger.critical("Username not specified!")
@@ -114,18 +113,19 @@ class AccountManagement(Command):
 
                     roles.append(r)
 
-            # update the user
-
         if (opt_delete):
             if (not opt_username):
                 app.logger.critical("Username not specified!")
                 abort()
 
-            if not user.User.find(opt_username):
+            u = user.User.find(opt_username)
+            if not u:
                 app.logger.critical("User does not exist!")
                 abort()
 
-            # delete the user
+            user.User.delete(u.id)
+            print('The user \'{}\' has been deleted.'.format(opt_username))
+
 
 # role management
 class RoleManagement(Command):
@@ -143,8 +143,6 @@ class RoleManagement(Command):
     )
 
     def run(self, opt_list, opt_create, opt_edit, opt_delete, opt_filter, opt_id, opt_name, opt_description, opt_permissions):
-        from scripts import permissions
-        permissions.run(db_manager.db)
 
         if (opt_list):
             roles = None
@@ -182,7 +180,6 @@ class RoleManagement(Command):
             db_manager.db.session.commit()
 
             print('Role \'{}\' with id {} created.'.format(opt_name, new_role.id))
-
 
         if (opt_edit):
             if (not opt_id or not opt_name):
@@ -241,10 +238,22 @@ class CollectorManagement(Command):
                 'api_url': opt_api_url,
                 'api_key': opt_api_key,
                 'collectors': [],
-                'status': 0
+                'status': '0'
             }
 
-            collectors_info, status_code = CollectorsApi(opt_api_url, opt_api_key).get_collectors_info("")
+            print('Trying to contact a new collector node...')
+            retries, max_retries = 0, 30
+            while retries < max_retries:
+                try:
+                    collectors_info, status_code = CollectorsApi(opt_api_url, opt_api_key).get_collectors_info("")
+                    break;
+                except:
+                    collectors_info = 'Collector unavailable'
+                    status_code = 0
+                    time.sleep(1)
+                retries += 1
+                print('Retrying [{}/{}]...'.format(retries, max_retries))
+
 
             if status_code != 200:
                 print('Cannot create a new collector node!')
@@ -256,7 +265,6 @@ class CollectorManagement(Command):
             collectors_info, status_code = CollectorsApi(opt_api_url, opt_api_key).get_collectors_info(node.id)
 
             print('Collector node \'{}\' with id {} created.'.format(opt_name, node.id))
-
 
         if (opt_edit):
             if (not opt_id or not opt_name):
@@ -324,6 +332,7 @@ class DictionaryManagement(Command):
             try:
                 attribute.Attribute.load_dictionaries('cve')
             except Exception:
+                app.logger.debug(traceback.format_exc())
                 app.logger.critical("File structure was not recognized!")
                 abort()
 
@@ -337,6 +346,7 @@ class DictionaryManagement(Command):
             try:
                 attribute.Attribute.load_dictionaries('cpe')
             except Exception:
+                app.logger.debug(traceback.format_exc())
                 app.logger.critical("File structure was not recognized!")
                 abort()
 
@@ -352,32 +362,81 @@ class DictionaryManagement(Command):
                         break
                     out_file.write(chunk)
         except Exception:
+            app.logger.debug(traceback.format_exc())
             app.logger.critical("Upload failed!")
             abort()
 
-class SampleData(Command):
-    def run(self):
-        with app.app_context():
-            from scripts import permissions
-            from scripts import sample_data
+# ApiKeys management
+class ApiKeysManagement(Command):
 
-            data, count = user.User.get(None, None)
-            if count:
-                app.logger.error("Sample data already installed.")
-                exit()
+    option_list = (
+        Option('--list', '-l', dest='opt_list', action='store_true'),
+        Option('--create', '-c', dest='opt_create', action='store_true'),
+        Option('--delete', '-d', dest='opt_delete', action='store_true'),
+        Option('--name', '-n', dest='opt_name'),
+        Option('--user', '-u', dest='opt_user'),
+        Option('--expires', '-e', dest='opt_expires')
+    )
 
-            app.logger.error("Installing sample data...")
-            permissions.run(db_manager.db)
-            sample_data.run(db_manager.db)
-            app.logger.error("Sample data installed.")
-        exit()
+
+    def run(self, opt_list, opt_create, opt_delete, opt_name, opt_user, opt_expires):
+
+        if (opt_list):
+            apikeys = apikey.ApiKey.get_all()
+            for k in apikeys:
+                print('Id: {}\n\tName: {}\n\tKey: {}\n\tCreated: {}\n\tUser id: {}\n\tExpires: {}'.format(k.id, k.name, k.key, k.created_at, k.user_id, k.expires_at))
+            exit()
+
+        if (opt_create):
+            if (not opt_name):
+                app.logger.critical("Name not specified!")
+                abort()
+
+            if apikey.ApiKey.find_by_name(opt_name):
+                app.logger.critical("Name already exists!")
+                abort()
+
+            if (not opt_user):
+                app.logger.critical("User not specified!")
+                abort()
+
+            u = None
+            if opt_user:
+                u = user.User.find(opt_user)
+                if not u:
+                    app.logger.critical("The specified user '{}' does not exist!".format(opt_user))
+                    abort()
+
+            data = {
+                #'id': None,
+                'name': opt_name,
+                'key': ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=40)),
+                'user_id': u.id,
+                'expires_at': opt_expires if opt_expires else None
+            }
+
+            k = apikey.ApiKey.add_new(data)
+            print('ApiKey \'{}\' with id {} created.'.format(opt_name, k.id))
+
+        if (opt_delete):
+            if (not opt_name):
+                app.logger.critical("Name not specified!")
+                abort()
+
+            k = apikey.ApiKey.find_by_name(opt_name)
+            if not k:
+                app.logger.critical("Name not found!")
+                abort()
+
+            apikey.ApiKey.delete(k.id)
+            print('ApiKey \'{}\' has been deleted.'.format(opt_name))
 
 
 manager.add_command('account', AccountManagement)
 manager.add_command('role', RoleManagement)
 manager.add_command('collector', CollectorManagement)
 manager.add_command('dictionary', DictionaryManagement)
-manager.add_command('sample-data', SampleData)
+manager.add_command('apikey', ApiKeysManagement)
 
 if __name__ == '__main__':
     manager.run()

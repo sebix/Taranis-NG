@@ -9,8 +9,8 @@ from managers.db_manager import db
 from model.acl_entry import ACLEntry
 from model.osint_source import OSINTSourceGroup, OSINTSource
 from model.tag_cloud import TagCloud
-from schema.acl_entry import ItemType
-from schema.news_item import NewsItemDataSchema, NewsItemAggregateSchema, NewsItemAttributeSchema, NewsItemSchema, \
+from shared.schema.acl_entry import ItemType
+from shared.schema.news_item import NewsItemDataSchema, NewsItemAggregateSchema, NewsItemAttributeSchema, NewsItemSchema, \
     NewsItemRemoteSchema
 
 
@@ -113,8 +113,6 @@ class NewsItemData(db.Model):
     @classmethod
     def get_all_news_items_data(cls, limit):
         limit = datetime.strptime(limit, '%d.%m.%Y - %H:%M')
-        limit = datetime.strftime(limit, '%Y-%m-%d - %H:%M')
-
         news_items_data = cls.query.filter(cls.collected > limit).all()
         news_items_data_schema = NewsItemDataSchema(many=True)
         return news_items_data_schema.dump(news_items_data)

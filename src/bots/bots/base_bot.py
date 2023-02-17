@@ -1,8 +1,9 @@
 import datetime
+import traceback
 
 from managers import time_manager
-from schema import bot, bot_preset
-from schema.parameter import Parameter, ParameterType
+from shared.schema import bot, bot_preset
+from shared.schema.parameter import Parameter, ParameterType
 from remote.core_api import CoreApi
 
 
@@ -12,7 +13,7 @@ class BaseBot:
     description = "Base abstract type for all bots"
 
     parameters = [
-        Parameter(0, "REFRESH_INTERVAL", "Refresh Interval", "How often is this bot doing its job",
+        Parameter(0, "REFRESH_INTERVAL", "Refresh Interval", "How often and when is this bot doing its job. Examples:<ul><li>10 --- perform the task every 10 minutes</li><li>10:30 --- perform the task every day at 10:30</li><li>Tuesday,10:30 --- perform the task every Tuesday at 10:30</li></ul>",
                   ParameterType.NUMBER)
     ]
 
@@ -35,12 +36,12 @@ class BaseBot:
 
     @staticmethod
     def print_exception(preset, error):
-        print('Bot Preset ID: ' + preset.id)
-        print('Bot Preset name: ' + preset.name)
+        print('Bot Preset:', preset.id, preset.name)
         if str(error).startswith('b'):
             print('ERROR: ' + str(error)[2:-1])
         else:
             print('ERROR: ' + str(error))
+        print('TRACEBACK:', traceback.format_exc(), flush=True)
 
     @staticmethod
     def history(interval):

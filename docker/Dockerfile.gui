@@ -1,5 +1,8 @@
 # build stage
 FROM node:lts-alpine as build-stage
+
+RUN npm install -g @vue/cli-service
+
 WORKDIR /app
 COPY ./src/gui/package*.json ./
 RUN npm install
@@ -8,6 +11,8 @@ COPY ./src/gui/src /app/src
 COPY ./src/gui/babel.config.js .
 COPY ./src/gui/package.json .
 COPY ./src/gui/package-lock.json .
+
+ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN npm run build
 
 # production stage

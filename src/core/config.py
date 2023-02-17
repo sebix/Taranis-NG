@@ -14,6 +14,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=DB_USER, pw=DB_PASSWORD,
                                                                                     url=DB_URL, db=DB_DATABASE)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ECHO = (os.getenv("DEBUG_SQL", "false").lower() == "true") # DEBUG SQL Queries
 
     if "DB_POOL_SIZE" in os.environ:
         DB_POOL_SIZE = os.getenv("DB_POOL_SIZE")
@@ -23,7 +24,7 @@ class Config(object):
         SQLALCHEMY_ENGINE_OPTIONS = {
             'pool_size': int(DB_POOL_SIZE),
             'pool_recycle': int(DB_POOL_RECYCLE),
-            'pool_pre_ping': False,
+            'pool_pre_ping': True,
             'pool_timeout': int(DB_POOL_TIMEOUT)
         }
 

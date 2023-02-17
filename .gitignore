@@ -5,6 +5,11 @@ __pycache__/
 node_modules/
 dist/
 build/
+.envrc
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
 
 # temporary files of editors
 .DS_Store
@@ -16,15 +21,20 @@ build/
 # sensitive data not to be commited
 .env.local
 .env.*.local
+src/.env
 *.pem
 *.key
 *.log
+local/
 
 # settings of editors
 .idea/
 .vscode/
+.vs/
 *.suo
 *.ntvs*
 *.njsproj
+*.pyproj
+*.pyproj.user
 *.sln
 *.sw?
