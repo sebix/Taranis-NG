@@ -1,4 +1,4 @@
-certifi==2019.11.28
+certifi==2023.7.22
 Flask==1.1.4
 Flask-Cors==3.0.10
 Flask-RESTful==0.3.7
