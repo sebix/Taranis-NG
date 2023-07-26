@@ -1,6 +1,6 @@
 beautifulsoup4==4.8.1
 bleach==4.1.0
-certifi==2021.10.8
+certifi==2023.7.22
 feedparser==5.2.1
 Flask==1.1.4
 Flask-Cors==3.0.10
