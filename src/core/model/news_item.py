@@ -113,7 +113,7 @@ class NewsItemData(db.Model):
     @classmethod
     def get_all_news_items_data(cls, limit):
         limit = datetime.strptime(limit, '%d.%m.%Y - %H:%M')
-        news_items_data = cls.query.filter(cls.collected > limit).all()
+        news_items_data = cls.query.filter(cls.collected >= limit).all()
         news_items_data_schema = NewsItemDataSchema(many=True)
         return news_items_data_schema.dump(news_items_data)
 
@@ -220,8 +220,8 @@ class NewsItem(db.Model):
                 NewsItem.id == news_item_id)
 
             query = query.join(NewsItemData, NewsItem.news_item_data_id == NewsItemData.id)
-            query = query.join(OSINTSource, NewsItemData.osint_source_id == OSINTSource.id)
-
+            # LEFT JOIN because when deleting Osint sources -> SET NULL to News items -> ACL right fails
+            query = query.outerjoin(OSINTSource, NewsItemData.osint_source_id == OSINTSource.id)
             query = query.outerjoin(ACLEntry, or_(and_(NewsItemData.osint_source_id == ACLEntry.item_id,
                                                        ACLEntry.item_type == ItemType.OSINT_SOURCE),
                                                   and_(OSINTSource.collector_id == ACLEntry.item_id,

@@ -9,6 +9,7 @@ from shared.schema.user import UserSchemaBase, UserProfileSchema, HotkeySchema, 
 from shared.schema.role import RoleIdSchema, PermissionIdSchema
 from shared.schema.organization import OrganizationIdSchema
 from shared.schema.word_list import WordListIdSchema
+from werkzeug.security import generate_password_hash
 
 
 class NewUserSchema(UserSchemaBase):
@@ -21,34 +22,46 @@ class NewUserSchema(UserSchemaBase):
         return User(**data)
 
 
+class UpdateUserSchema(UserSchemaBase):
+    password = fields.Str(load_default=None, allow_none=True)
+
+    roles = fields.Nested(RoleIdSchema, many=True)
+    permissions = fields.Nested(PermissionIdSchema, many=True)
+    organizations = fields.Nested(OrganizationIdSchema, many=True)
+
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     name = db.Column(db.String(), nullable=False)
+    password = db.Column(db.String(), nullable=False)
 
     organizations = db.relationship("Organization", secondary="user_organization")
-
     roles = db.relationship(Role, secondary='user_role')
     permissions = db.relationship(Permission, secondary='user_permission')
 
     profile_id = db.Column(db.Integer, db.ForeignKey('user_profile.id'))
     profile = db.relationship("UserProfile", cascade="all")
 
-    def __init__(self, id, username, name, organizations, roles, permissions):
+    def __init__(self, id, username, name, password, organizations, roles, permissions):
         self.id = None
         self.username = username
         self.name = name
+        self.password = generate_password_hash(password)
         self.organizations = []
-        for organization in organizations:
-            self.organizations.append(Organization.find(organization.id))
+        if organizations:
+            for organization in organizations:
+                self.organizations.append(Organization.find(organization.id))
 
         self.roles = []
-        for role in roles:
-            self.roles.append(Role.find(role.id))
+        if roles:
+            for role in roles:
+                self.roles.append(Role.find(role.id))
 
         self.permissions = []
-        for permission in permissions:
-            self.permissions.append(Permission.find(permission.id))
+        if permissions:
+            for permission in permissions:
+                self.permissions.append(Permission.find(permission.id))
 
         self.profile = UserProfile(True, False, [], [])
         self.title = ""
@@ -125,14 +138,28 @@ class User(db.Model):
 
     @classmethod
     def update(cls, user_id, data):
-        schema = NewUserSchema()
+        schema = UpdateUserSchema()
         updated_user = schema.load(data)
         user = cls.query.get(user_id)
-        user.username = updated_user.username
-        user.name = updated_user.name
-        user.organizations = updated_user.organizations
-        user.roles = updated_user.roles
-        user.permissions = updated_user.permissions
+        user.username = updated_user["username"]
+        user.name = updated_user["name"]
+        if updated_user["password"]:  # update password only when user fill it
+            user.password = generate_password_hash(updated_user["password"])
+        user.organizations = []
+        for o in updated_user["organizations"]:
+            org = Organization.find(o.id)
+            if org:
+                user.organizations.append(org)
+        user.roles = []
+        for r in updated_user["roles"]:
+            role = Role.find(r.id)
+            if role:
+                user.roles.append(role)
+        user.permissions = []
+        for p in updated_user["permissions"]:
+            perm = Permission.find(p.id)
+            if perm:
+                user.permissions.append(perm)
         db.session.commit()
 
     @classmethod

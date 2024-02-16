@@ -698,7 +698,7 @@ DSoCioAioAgoAopAIASUoARCSPcrAoqAIqAIKAKKQMwR+H8tw5b8TFqqNAAAAABJRU5ErkJggg==">
                 <td class="w15 py-0">
                     <div class="mt-2">
                       <label class="checkbox-button">
-                        <input type="checkbox" class="checkbox-button__input" id="critical" name="critical" {% if report_item.attrs.confidentiality == 'TOPSECRET' %}checked{% endif %}>
+                        <input type="checkbox" class="checkbox-button__input" id="critical" name="critical" {% if report_item.attrs.confidentiality == 'TOP SECRET' %}checked{% endif %}>
                         <span class="checkbox-button__control"></span>
                         <span class="checkbox-button__label">Top Secret</span>
                       </label>
@@ -719,7 +719,7 @@ DSoCioAioAgoAopAIASUoARCSPcrAoqAIqAIKAKKQMwR+H8tw5b8TFqqNAAAAABJRU5ErkJggg==">
 			{% if report_item.attrs.tlp == 'AMBER' %}
 			<span style="padding: 4px; background-color: black !important; color:#ffc000; font-weight: 700">TLP:AMBER</span>
 			{% endif %}
-			{% if report_item.attrs.tlp == 'AMBERSTRICT' %}
+			{% if report_item.attrs.tlp == 'AMBER+STRICT' %}
 			<span style="padding: 4px; background-color: black !important; color:#ffc000; font-weight: 700">TLP:AMBER+STRICT</span>
 			{% endif %}
 			{% if report_item.attrs.tlp == 'RED' %}
@@ -853,7 +853,6 @@ DSoCioAioAgoAopAIASUoARCSPcrAoqAIqAIKAKKQMwR+H8tw5b8TFqqNAAAAABJRU5ErkJggg==">
                 <tr class="footer_text footer_color align-middle">
                     <td class="w30 py-0 text_bold">Created by Taranis NG</td>
                     <td class="w40 py-0 text-center info">Repo: <a href="https://github.com/SK-CERT/Taranis-NG/">github.com/SK-CERT/Taranis-NG</a></td>
-    sk-cert@nbu.gov.sk</td>
                     <td class="w30 py-0 text-right text_bold">Company name</td>
                 </tr>
                 <tr class="footer_text">

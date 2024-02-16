@@ -37,13 +37,17 @@ entrypoint, and the [gunicorn](https://gunicorn.org/) configuration file.
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/engine/install/)
-- [docker-compose](https://docs.docker.com/compose/install/) >= 1.27.0
+- [docker-compose](https://docs.docker.com/compose/install/) >= 1.27.0 (In July 2023, Compose V1 has been deprecated)
+
+or
+
+- [Compose V2](https://docs.docker.com/compose/migrate/), which is part of standard Docker Engine installation
 - (Optional) [Vim](https://www.vim.org/) or other text editor - for configuration and development
 
 Please note it is important to use the abovementioned version of
 `docker-compose` or newer, otherwise the build and deploy will fail.
 
-## Quickly build and run Taranis NG using `docker-compose`
+## Quickly build and run Taranis NG using `docker-compose` or `docker compose`
 
 _First_, you need to clone the source code repository:
 
@@ -66,12 +70,24 @@ _Finally_, either deploy the ready-made images from Docker hub with:
 docker-compose -f docker/docker-compose.yml pull
 docker-compose -f docker/docker-compose.yml up --no-build
 ```
+or
+```bash
+docker compose -f docker/docker-compose.yml pull
+docker compose -f docker/docker-compose.yml up --no-build
+```
 
 or, alternatively, build and run the containers with:
 
 ```bash
-TARANIS_NG_TAG=build docker-compose -f docker/docker-compose.yml up --build
+TARANIS_NG_TAG=build docker-compose -f docker/docker-compose.yml build --pull
+TARANIS_NG_TAG=build docker-compose -f docker/docker-compose.yml up
 ```
+or
+```bash
+TARANIS_NG_TAG=build docker compose -f docker/docker-compose.yml build --pull
+TARANIS_NG_TAG=build docker compose -f docker/docker-compose.yml up
+```
+(`--pull` updates the base images)
 
 **Voila, Taranis NG is up and running. Visit your instance by navigating to
 [https://localhost:4443/](https://localhost:4443/) using your web browser**.

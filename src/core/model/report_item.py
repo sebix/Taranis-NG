@@ -38,7 +38,7 @@ class ReportItemAttribute(db.Model):
     current = db.Column(db.Boolean, default=True)
 
     attribute_group_item_id = db.Column(db.Integer, db.ForeignKey('attribute_group_item.id'))
-    attribute_group_item = db.relationship("AttributeGroupItem")
+    attribute_group_item = db.relationship("AttributeGroupItem", viewonly=True)
     attribute_group_item_title = db.Column(db.String)
 
     report_item_id = db.Column(db.Integer, db.ForeignKey('report_item.id'), nullable=True)
@@ -61,10 +61,6 @@ class ReportItemAttribute(db.Model):
     def find(cls, attribute_id):
         report_item_attribute = cls.query.get(attribute_id)
         return report_item_attribute
-
-    @staticmethod
-    def sort(report_item_attribute):
-        return report_item_attribute.last_updated
 
 
 class NewReportItemSchema(ReportItemBaseSchema):
@@ -94,11 +90,11 @@ class ReportItem(db.Model):
     completed = db.Column(db.Boolean, default=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    user = db.relationship("User")
+    user = db.relationship("User", viewonly=True)
     remote_user = db.Column(db.String())
 
     report_item_type_id = db.Column(db.Integer, db.ForeignKey('report_item_type.id'), nullable=True)
-    report_item_type = db.relationship("ReportItemType")
+    report_item_type = db.relationship("ReportItemType", viewonly=True)
 
     news_item_aggregates = db.relationship("NewsItemAggregate", secondary='report_item_news_item_aggregate')
 
@@ -141,7 +137,7 @@ class ReportItem(db.Model):
     def reconstruct(self):
         self.subtitle = ""
         self.tag = "mdi-file-table-outline"
-        self.attributes.sort(key=ReportItemAttribute.sort)
+        self.attributes.sort(key=lambda obj: (obj.attribute_group_item.attribute_group.index, obj.attribute_group_item.index, obj.id))
 
     @classmethod
     def count_all(cls, is_completed):
@@ -379,14 +375,15 @@ class ReportItem(db.Model):
 
                 if 'attribute_id' in data:
                     for attribute in report_item.attributes:
-                        if attribute.id == data['attribute_id']:
+                        # sometime we compare: int & int or int & str
+                        if str(attribute.id) == str(data['attribute_id']):
                             if attribute.value != data['attribute_value']:
                                 modified = True
                                 attribute.value = data['attribute_value']
                                 data['attribute_value'] = ''
                                 attribute.user = user
                                 attribute.last_updated = datetime.now()
-                                break
+                            break
 
             if 'add' in data:
                 if 'attribute_id' in data:
@@ -411,7 +408,8 @@ class ReportItem(db.Model):
                 if 'attribute_id' in data:
                     attribute_to_delete = None
                     for attribute in report_item.attributes:
-                        if attribute.id == data['attribute_id']:
+                        # sometime we compare: int & int or int & str
+                        if str(attribute.id) == str(data['attribute_id']):
                             attribute_to_delete = attribute
                             break
 
@@ -470,7 +468,7 @@ class ReportItem(db.Model):
 
                 if 'attribute_id' in data:
                     for attribute in report_item.attributes:
-                        if attribute.id == data['attribute_id']:
+                        if str(attribute.id) == data['attribute_id']:
                             data['attribute_value'] = attribute.value
                             data['attribute_last_updated'] = attribute.last_updated.strftime('%d.%m.%Y - %H:%M')
                             data['attribute_user'] = attribute.user.name
@@ -493,7 +491,7 @@ class ReportItem(db.Model):
 
                 if 'attribute_id' in data:
                     for attribute in report_item.attributes:
-                        if attribute.id == data['attribute_id']:
+                        if str(attribute.id) == data['attribute_id']:
                             data['attribute_value'] = attribute.value
                             data['binary_mime_type'] = attribute.binary_mime_type
                             data['binary_size'] = attribute.binary_size
