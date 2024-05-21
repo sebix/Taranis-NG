@@ -26,7 +26,7 @@ python-dotenv==0.10.3
 python-editor==1.0.4
 python-keycloak==0.23.0
 pytz==2019.3
-requests==2.26.0
+requests==2.32.0
 schedule==0.6.0
 six==1.13.0
 sseclient-py==1.7
