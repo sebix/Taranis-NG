@@ -7,7 +7,7 @@ Flask-Cors==3.0.10
 Flask-RESTful==0.3.7
 gevent==21.8.0
 greenlet==1.1.1
-gunicorn==20.0.4
+gunicorn==22.0.0
 lxml==4.6.5
 marshmallow==3.5.0
 marshmallow-enum==1.5.1
@@ -20,11 +20,12 @@ python-dotenv==0.10.5
 pytz==2019.3
 requests==2.26.0
 schedule==0.6.0
-selenium==4.0.0
+selenium==4.15.1
 six==1.14.0
 slackclient==1.0.7
 soupsieve==1.9.5
 tweepy==3.8.0
 Werkzeug==0.16.0
 zipp==3.1.0
-dateparser==1.1.1
+dateparser==1.1.6
+setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
