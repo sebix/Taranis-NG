@@ -23,4 +23,4 @@ sseclient-py==1.7
 tweepy==3.8.0
 urllib3==1.26.7
 Werkzeug==0.16.0
-zipp==3.1.0
+zipp==3.19.1
