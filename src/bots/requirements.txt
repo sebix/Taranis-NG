@@ -1,6 +1,6 @@
 certifi==2019.11.28
 Flask==1.1.4
-Flask-Cors==3.0.10
+Flask-Cors==4.0.1
 Flask-RESTful==0.3.7
 gevent==21.8.0
 greenlet==1.1.1
