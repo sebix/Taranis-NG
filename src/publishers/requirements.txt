@@ -4,7 +4,7 @@ Flask-Cors==3.0.10
 Flask-RESTful==0.3.7
 gevent==21.8.0
 greenlet==1.1.1
-gunicorn==20.0.4
+gunicorn==21.2.0
 httplib2==0.18.1
 idna==2.9
 marshmallow==3.5.0
