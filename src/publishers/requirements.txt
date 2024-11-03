@@ -2,7 +2,7 @@ certifi==2019.11.28
 Flask==1.1.4
 Flask-Cors==3.0.10
 Flask-RESTful==0.3.7
-gevent==21.8.0
+gevent==24.10.1
 greenlet==1.1.1
 gunicorn==20.0.4
 httplib2==0.18.1
@@ -22,7 +22,7 @@ schedule==0.6.0
 six==1.13.0
 tweepy==3.10.0
 urllib3==1.26.7
-Werkzeug==0.16.0
+Werkzeug==3.0.6
 zope.event==4.4
 zope.interface==5.1.0
 pymisp==2.4.128
