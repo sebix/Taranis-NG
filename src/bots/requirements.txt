@@ -10,3 +10,4 @@ python-dotenv==1.0.1
 requests==2.32.3
 schedule==1.2.2
 sseclient-py==1.8.0
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
