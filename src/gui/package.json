@@ -24,7 +24,7 @@
         "installdropzone": "npm install --save vue2-dropzone"
     },
   "dependencies": {
-    "@vue/cli": "^4.5.19",
+    "@vue/cli": "^5.0.1",
     "axios": "^0.28.1",
     "core-js": "^2.6.12",
     "js-base64": "^3.7.7",
